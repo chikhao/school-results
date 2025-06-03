@@ -5,25 +5,25 @@ import pandas as pd
 app = Flask(__name__)
 CORS(app)
 
-# ÊÍãíá Çáãáİ ÚäÏ ÈÏÁ ÇáÊÔÛíá
+# ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ù…Ù„Ù Ø¹Ù†Ø¯ Ø¨Ø¯Ø¡ Ø§Ù„ØªØ´ØºÙŠÙ„
 EXCEL_PATH = "chat.xlsx"
 
-# ÇáÃŞÓÇã ÇáãÑãøÒÉ æÃÓãÇÄåÇ
+# Ø§Ù„Ø£Ù‚Ø³Ø§Ù… Ø§Ù„Ù…Ø±Ù…Ù‘Ø²Ø© ÙˆØ£Ø³Ù…Ø§Ø¤Ù‡Ø§
 SECTION_MAP = {
-    "3111001": "Ì ã Â 1",
-    "3111002": "Ì ã Â 2",
-    "3112001": "Ì ã Ú Ê 1",
-    "3112002": "Ì ã Ú Ê 2",
-    "3112003": "Ì ã Ú Ê 3",
+    "3111001": "Ø¬ Ù… Ø¢ 1",
+    "3111002": "Ø¬ Ù… Ø¢ 2",
+    "3112001": "Ø¬ Ù… Ø¹ Øª 1",
+    "3112002": "Ø¬ Ù… Ø¹ Øª 2",
+    "3112003": "Ø¬ Ù… Ø¹ Øª 3",
 }
 
-# ÊÍãíá ßá ÇáÃŞÓÇã ãÑÉ æÇÍÏÉ İí ÇáĞÇßÑÉ
+# ØªØ­Ù…ÙŠÙ„ ÙƒÙ„ Ø§Ù„Ø£Ù‚Ø³Ø§Ù… Ù…Ø±Ø© ÙˆØ§Ø­Ø¯Ø© ÙÙŠ Ø§Ù„Ø°Ø§ÙƒØ±Ø©
 sections_data = {}
 
 for sheet_id, label in SECTION_MAP.items():
     try:
         df = pd.read_excel(EXCEL_PATH, sheet_name=sheet_id, skiprows=7)
-        df = df[['ÇááŞÈ', 'ÇáÇÓã', 'ÊÇÑíÎ ÇáãíáÇÏ', df.columns[6], df.columns[7]]]
+        df = df[['Ø§Ù„Ù„Ù‚Ø¨', 'Ø§Ù„Ø§Ø³Ù…', 'ØªØ§Ø±ÙŠØ® Ø§Ù„Ù…ÙŠÙ„Ø§Ø¯', df.columns[6], df.columns[7]]]
         df.columns = ['last_name', 'first_name', 'birth_date', 'avg_grade', 'exam_grade']
         df['birth_date'] = pd.to_datetime(df['birth_date']).dt.date
         sections_data[label] = df
@@ -37,21 +37,21 @@ def get_result():
     birth_date_str = data.get("birth_date")
 
     if not section or not birth_date_str:
-        return jsonify({"error": "ÇáÑÌÇÁ ÇÎÊíÇÑ ÇáŞÓã æÅÏÎÇá ÊÇÑíÎ ÇáãíáÇÏ"}), 400
+        return jsonify({"error": "Ø§Ù„Ø±Ø¬Ø§Ø¡ Ø§Ø®ØªÙŠØ§Ø± Ø§Ù„Ù‚Ø³Ù… ÙˆØ¥Ø¯Ø®Ø§Ù„ ØªØ§Ø±ÙŠØ® Ø§Ù„Ù…ÙŠÙ„Ø§Ø¯"}), 400
 
     try:
         birth_date = pd.to_datetime(birth_date_str).date()
     except:
-        return jsonify({"error": "ÊÇÑíÎ ÇáãíáÇÏ ÛíÑ ÕÇáÍ"}), 400
+        return jsonify({"error": "ØªØ§Ø±ÙŠØ® Ø§Ù„Ù…ÙŠÙ„Ø§Ø¯ ØºÙŠØ± ØµØ§Ù„Ø­"}), 400
 
     df = sections_data.get(section)
     if df is None:
-        return jsonify({"error": "ÇáŞÓã ÛíÑ ãæÌæÏ"}), 404
+        return jsonify({"error": "Ø§Ù„Ù‚Ø³Ù… ØºÙŠØ± Ù…ÙˆØ¬ÙˆØ¯"}), 404
 
     match = df[df["birth_date"] == birth_date]
 
     if match.empty:
-        return jsonify({"error": "áÇ ÊæÌÏ äÊÇÆÌ áåĞÇ ÇáÊÇÑíÎ İí åĞÇ ÇáŞÓã"}), 404
+        return jsonify({"error": "Ù„Ø§ ØªÙˆØ¬Ø¯ Ù†ØªØ§Ø¦Ø¬ Ù„Ù‡Ø°Ø§ Ø§Ù„ØªØ§Ø±ÙŠØ® ÙÙŠ Ù‡Ø°Ø§ Ø§Ù„Ù‚Ø³Ù…"}), 404
 
     student = match.iloc[0]
     return jsonify({
